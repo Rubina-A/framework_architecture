@@ -1,0 +1,16 @@
+# Кэш Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Кэш pytest
+.pytest_cache/
+.allure-results/
+allure-results/
+
+# VS Code
+.vscode/
+
+# Системное
+.DS_Store
+Thumbs.db
