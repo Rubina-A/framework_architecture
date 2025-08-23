@@ -1,5 +1,6 @@
-BASE_URL = "https://market-delivery.yandex.ru/novosibirsk?shippingType=delivery"
-API_URL = "https://market-delivery.yandex.ru/eats/v1/"
+BASE_URL = "https://market-delivery.yandex.ru"
+API_URL = "https://market-delivery.yandex.ru"
+
 
 BROWSER = "chrome"
 IMPLICIT_WAIT = 10

@@ -1,4 +1,9 @@
-# тестовые данные (заглушки)
-USER_EMAIL = "test@example.com"
-USER_PASSWORD = "P@ssw0rd"
-AUTH_TOKEN = "fake_token_for_tests"
+COOKIES = {
+    "yandexuid": "2839956031712478860",
+    "yashr": "1754652871747652011",
+    "yuidss": "2839956031712478860",
+    "Session_id": "3:1755848311.5.0.1755848311992:OiDQsA:9b00.1.2:1|1572089986.-1.2.3:1755848311|3:11110534.259443.zz7bFeDYaXcjTDRkOeqpApoxJA4",
+    "sessionid2": "3:1755848311.5.0.1755848311992:OiDQsA:9b00.1.2:1|1572089986.-1.2.3:1755848311|3:11110534.259443.fakesign0000000000000000000",
+    "L": "YQdTaFVce3x5fmxhc1Nte14MUmdiX0d7BxMKERgkLQwu.1755848312.16256.380106.14fab7535f5fb8686b43174f5af93f39",
+    "yandex_login": "jukrybina"
+}
