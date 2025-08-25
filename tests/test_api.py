@@ -3,42 +3,99 @@ import requests
 from config import settings, test_data
 
 
-@allure.feature("API Tests")
-class TestAPI:
+@allure.feature("API Tests — Поиск")
+class TestAPISearch:
 
-    @allure.story("Получение списка ресторанов")
-    def test_get_restaurants(self):
-        url = f"{settings.API_URL}/restaurants"
-        response = requests.get(url)
+    endpoint = f"{settings.API_URL}/eats/v1/full-text-search/v1/search"
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    cookies = test_data.COOKIES   # вынесли куки в отдельный файл
+
+    @allure.story("Поиск по названию на кириллице")
+    def test_search_cyrillic(self):
+        payload = {
+            "text": "магнит косметик",
+            "filters": [],
+            "location": {"longitude": 82.88865760667233, "latitude": 55.01369962898733}
+        }
+        response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
-        assert "restaurants" in response.json()
+        data = response.json()
 
-    @allure.story("Получение меню ресторана")
-    def test_get_menu(self):
-        url = f"{settings.API_URL}/restaurants/1/menu"
-        response = requests.get(url)
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+
+    @allure.story("Поиск по названию на латинице")
+    def test_search_latin(self):
+        payload = {
+            "text": "apple",
+            "filters": [],
+            "location": {"longitude": 82.88865760667233, "latitude": 55.01369962898733}
+        }
+        response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
-        assert "items" in response.json()
+        data = response.json()
 
-    @allure.story("Добавление товара в корзину")
-    def test_add_to_cart(self):
-        url = f"{settings.API_URL}/cart/add"
-        payload = {"product_id": 101, "quantity": 1}
-        response = requests.post(url, json=payload, headers={"Authorization": f"Bearer {test_data.AUTH_TOKEN}"})
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        
+
+    @allure.story("Поиск по названию с цифрами")
+    def test_search_digits(self):
+        payload = {
+            "text": "13",
+            "filters": [],
+            "location": {"longitude": 82.88865760667233, "latitude": 55.01369962898733}
+        }
+        response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
-        assert response.json()["status"] == "ok"
+        data = response.json()
 
-    @allure.story("Удаление товара из корзины")
-    def test_remove_from_cart(self):
-        url = f"{settings.API_URL}/cart/remove"
-        payload = {"product_id": 101}
-        response = requests.post(url, json=payload, headers={"Authorization": f"Bearer {test_data.AUTH_TOKEN}"})
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        
+
+    @allure.story("Пустой поиск")
+    def test_search_empty(self):
+        payload = {
+            "text": "",
+            "filters": [],
+            "location": {"longitude": 82.88865760667233, "latitude": 55.01369962898733}
+        }
+        response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
-        assert response.json()["status"] == "ok"
+        data = response.json()
 
-    @allure.story("Оформление заказа")
-    def test_checkout(self):
-        url = f"{settings.API_URL}/checkout"
-        payload = {"address": "Новосибирск, Ленина 1", "payment": "card"}
-        response = requests.post(url, json=payload, headers={"Authorization": f"Bearer {test_data.AUTH_TOKEN}"})
-        assert response.status_code in [200, 400]  # зависит от данных
+        # Проверка наличия блока "Часто ищут"
+        often_searched = next((b for b in data.get("blocks", []) if b.get("title") == "Часто ищут"), None)
+        assert often_searched is not None, 'Блок "Часто ищут" не найден'
+
+        # Проверка, что есть хотя бы один элемент в payload
+        assert len(often_searched.get("payload", [])) > 0, 'Payload блока "Часто ищут" пустой'
+
+        
+    @allure.story("Поиск по произвольному набору символов")
+    def test_search_symbols(self):
+        payload = {
+            "text": "!@#$%",
+            "filters": [],
+            "location": {"longitude": 82.88865760667233, "latitude": 55.01369962898733}
+        }
+        response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
+        assert response.status_code == 200
+        data = response.json()
+
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        
