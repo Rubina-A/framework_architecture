@@ -23,6 +23,12 @@ class TestAPISearch:
         }
         response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
+        data = response.json()
+
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
 
     @allure.story("Поиск по названию на латинице")
     def test_search_latin(self):
@@ -33,6 +39,13 @@ class TestAPISearch:
         }
         response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
+        data = response.json()
+
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        
 
     @allure.story("Поиск по названию с цифрами")
     def test_search_digits(self):
@@ -43,6 +56,13 @@ class TestAPISearch:
         }
         response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
+        data = response.json()
+
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        
 
     @allure.story("Пустой поиск")
     def test_search_empty(self):
@@ -53,7 +73,16 @@ class TestAPISearch:
         }
         response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
+        data = response.json()
 
+        # Проверка наличия блока "Часто ищут"
+        often_searched = next((b for b in data.get("blocks", []) if b.get("title") == "Часто ищут"), None)
+        assert often_searched is not None, 'Блок "Часто ищут" не найден'
+
+        # Проверка, что есть хотя бы один элемент в payload
+        assert len(often_searched.get("payload", [])) > 0, 'Payload блока "Часто ищут" пустой'
+
+        
     @allure.story("Поиск по произвольному набору символов")
     def test_search_symbols(self):
         payload = {
@@ -63,3 +92,10 @@ class TestAPISearch:
         }
         response = requests.post(self.endpoint, json=payload, headers=self.headers, cookies=self.cookies)
         assert response.status_code == 200
+        data = response.json()
+
+        # Проверка заголовка — допускаем оба варианта ответа
+        assert (
+            "Найдено" in data["header"]["text"] or "Ничего не нашли" in data["header"]["text"]
+        ), f"Неожиданный header.text: {data['header']['text']}"
+        

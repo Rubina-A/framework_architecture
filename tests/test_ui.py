@@ -149,6 +149,11 @@ class TestUI:
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "div.pwwswtx > button"))
             )
             add_button.click()
+                        
+            next_button = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "button.r1jyb6b1"))
+            )
+            assert next_button is not None, "Кнопка 'Далее' не найдена"
 
     @allure.story("Добавление 10 бургеров Воппер в корзину")
     def test_add_10_burgers_to_cart(self, open_base: WebDriver):
@@ -212,3 +217,8 @@ class TestUI:
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "div.pwwswtx > button"))
             )
             add_button.click()
+
+            next_button = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "button.r1jyb6b1"))
+            )
+            assert next_button is not None, "Кнопка 'Далее' не найдена"
